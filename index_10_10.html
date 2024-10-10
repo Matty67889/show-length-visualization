@@ -42,7 +42,7 @@
 
 
     /* Netflix dataset visualization */
-    d3.csv('netflix_titles_cleaned_with_office.csv', d3.autoType).then((data) => {
+    d3.csv('data/netflix_titles_cleaned_with_office.csv', d3.autoType).then((data) => {
       console.log(data);
 
 
@@ -58,12 +58,12 @@
       newArea.append('g')
         .attr('class', 'y axis')
         .call(leftAxis);
-        
+
       newArea.append("g").attr("class", "y gridlines").call(leftGridlines);
 
-            const releaseYearExtent = d3.extent(data, d => d.release_year);
+      const releaseYearExtent = d3.extent(data, d => d.release_year);
       const releaseYearScale = d3.scaleLinear().domain(releaseYearExtent).range([0, newWidth]);
-     
+
       let bottomAxis = d3.axisBottom(releaseYearScale);
       let bottomGridlines = d3.axisBottom(releaseYearScale).tickSize(-newHeight).tickFormat("");
       newArea.append('g').attr('class', 'x axis').attr('transform', `translate(0, ${newHeight})`).call(bottomAxis);
@@ -82,7 +82,7 @@
 
     /* HBO dataset visualization */
     // averaging for svg2 visualization
-    d3.csv('titles.csv', d3.autoType).then((data) => {
+    d3.csv('data/hbo_titles.csv', d3.autoType).then((data) => {
       const movieStats = {};
       let maxim = 0;
       let max_year = 0;
@@ -183,7 +183,7 @@
         }
       }
     });
-    
+
 
 
     // legend
