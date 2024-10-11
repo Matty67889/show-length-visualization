@@ -21,9 +21,10 @@
       Matthew Mentis-Cort (mam692), Dani Ojeda (dr497), Jenny Jung (jj427)
     </h3>
     <p id="Bar Chart">Visualization: Bar Charts</p>
-    <svg id="legend-element" height="200" width="1450"></svg>
+    
     <svg id="svg2" height="800" width="1450"></svg>
     <svg id="svg1" height="800" width="1450"></svg>
+    <svg id="legend-element" height="300" width="1450"></svg>
 
     <!-- <svg id="svg3" height="500" width="500"></svg> -->
 
@@ -31,22 +32,24 @@
       // Function to retrieve color based on genre. This is used both in chart making and legend making
       function color(gen) {
         if (gen == "comedy") {
-          return "#FFC300 ";
+          return "#FFBF00 ";
         }
         if (gen == "family") {
-          return "#6B5B93";
+          return "#f0892a";
         }
         if (gen == "thriller") {
-          return "#88B04B";
+          
+          return "#af91f3";
         }
         if (gen == "animation") {
-          return "#F7CAC9";
+          return "#1159d8";
+          
         }
         if (gen == "action") {
-          return "#92A8D1";
+          return "#69c4e9 ";
         }
         if (gen == "scifi") {
-          return "#bab0f5";
+          return "#9CD08F";
         }
         if (gen == "fantasy") {
           return "#6A0572";
@@ -59,30 +62,34 @@
         }
         if (gen == "drama") {
           return "#FF6F61";
+          
         }
         if (gen == "documentation") {
-          return "#69c4e9 ";
+          return "#B9D6F2";
+          
+    
         }
         if (gen == "history") {
           return "#c28107";
         }
         if (gen == "reality") {
-          return "#61C0BF";
+          return "#f76abd";
         }
         if (gen == "war") {
-          return "black";
+          return "maroon";
         }
         if (gen == "romance") {
-          return "#F09CBA";
+          return "#DD1C1A";
         }
         if (gen == "sport") {
           return "#f88c27 ";
         }
         if (gen == "horror") {
-          return "#c20737 ";
+          return "black ";
         }
         if (gen == "european") {
-          return "#D1E8E4";
+          return "#8F5C38";
+          
         }
         if (gen == "western") {
           return "#955251";
@@ -90,7 +97,7 @@
       }
       /* Constants */
       // all chart margins
-      const margin = { top: 10, right: 10, bottom: 90, left: 70 };
+      const margin = { top: 20, right: 10, bottom: 90, left: 70 };
 
       // svg1 constants
       const svg1 = d3.select("#svg1");
@@ -161,6 +168,7 @@
           if (d.type == "MOVIE") {
             const d_genres = JSON.parse(d.genres.replace(/'/g, '"'));
             const year = d.release_year;
+
             if (!movieStats[year]) {
               movieStats[year] = {
                 totalLength: 0,
@@ -177,6 +185,7 @@
           }
         });
         let tot_mg = [];
+        let mv_genre = [];
         for (year in movieStats) {
           let g_counts = [];
           for (const g of movieStats[year].genres) {
@@ -199,6 +208,9 @@
             }
           }
           //setting color of bar to color of most frequent genre for that year
+          if (!mv_genre.includes(gmax)) {
+            mv_genre.push(gmax);
+          }
           movieStats[year].color = color(gmax);
 
           if (movieStats[year].totalLength / movieStats[year].count > maximm) {
@@ -206,6 +218,7 @@
             max_myear = year;
           }
         }
+        console.log(mv_genre);
 
         // separating show data by year, storiung total runtime, count, genres, and final color of bar
 
@@ -220,6 +233,8 @@
             const d_genres = JSON.parse(d.genres.replace(/'/g, '"'));
 
             const year = d.release_year;
+            if (year >= 1960) {
+            }
             if (!tvStats[year]) {
               tvStats[year] = {
                 totalLength: 0,
@@ -243,7 +258,8 @@
           }
         });
 
-        const tv_years = [];
+        let tv_genre = [];
+        let tv_years = [];
         let tot_g = [];
         for (year in tvStats) {
           let g_counts = [];
@@ -267,6 +283,10 @@
             }
           }
           //setting color of bar to color of most frequent genre for that year
+          if (!tv_genre.includes(gmax)) {
+            tv_genre.push(gmax);
+          }
+
           tvStats[year].color = color(gmax);
           if (tvStats[year].totalLength / tvStats[year].count > maximt) {
             maximt = tvStats[year].totalLength / tvStats[year].count;
@@ -274,9 +294,25 @@
             tv_years.push(year);
           }
         }
+        console.log(tv_genre);
 
         // making chart margins and scales for both movies and tv shows
+        svg2
+        .append("text")
+        .attr("x", (svg2ChartWidth/2) +margin.left+margin.right)
+        .attr("y", margin.top+10)
+        .text("Average Movie Run Time By Year")
+        .attr("text-anchor", "middle")
+        .style("font-size", "19px").style("font-weight", "bold");
         const margins = { top: 10, right: 20, bottom: 50, left: 70 };
+        svg1
+        .append("text")
+        .attr("x", (newWidth/2) +margin.left+margin.right)
+        .attr("y", margin.top+10)
+        .text("Average Episode Run Time By Year")
+        .attr("text-anchor", "middle")
+        .style("font-size", "19px").style("font-weight", "bold");
+        
 
         let newArea = svg2
           .append("g")
@@ -292,6 +328,7 @@
           .domain([0, upper_movie_max + 10])
           .range([svg2ChartHeight, 0]);
         const releaseYearExtent = d3.extent(data, (d) => d.release_year);
+        //const releaseYearExtent = [ 1915, mreleaseYearExtent[1]]
         const releaseYearScale = d3
           .scaleLinear()
           .domain([releaseYearExtent[0] - 2, releaseYearExtent[1] + 5])
@@ -301,7 +338,8 @@
           .scaleLinear()
           .domain([0, upper_tv_max + 10])
           .range([svg2ChartHeight, 0]);
-        const tvreleaseYearExtent = [tv_min - 2, tv_max];
+        //const tvreleaseYearExtent = [tv_min - 2, tv_max];
+        const tvreleaseYearExtent = [1960 - 2, tv_max];
         console.log(tvreleaseYearExtent);
         const tvreleaseYearScale = d3
           .scaleLinear()
@@ -413,7 +451,7 @@
               .attr("y2", newHeight)
               .style("stroke", color)
               .style("stroke-width", 10);
-            console.log(year + " " + color);
+            //console.log(year + " " + color);
           }
         }
         //adding labels for tv chart
@@ -456,7 +494,7 @@
           .append("text")
           .attr("class", "axis-label")
           .attr("x", svg2ChartWidth / 2 + margin.left)
-          .attr("y", svg2ChartHeight + 60)
+          .attr("y", svg2ChartHeight + 80)
           .attr("text-anchor", "middle")
           .text("Year");
 
@@ -473,7 +511,7 @@
           .append("text")
           .attr("class", "axis-label")
           .attr("x", svg2ChartWidth / 2 + margin.left)
-          .attr("y", newHeight + 60)
+          .attr("y", newHeight + 80)
           .attr("text-anchor", "middle")
           .text("Year");
 
@@ -491,62 +529,58 @@
 
       legendSVG
         .append("text")
-        .attr("x", 730)
+        .attr("x", (svg2ChartWidth/2) +margin.left+margin.right)
         .attr("y", 15)
-        .text("Genres")
+        .text("Most Common Genre in a Specific Year")
+        .attr("text-anchor", "middle")
         .style("font-size", "20px");
 
       const genres = [
         "comedy",
-        "family",
-        "thriller",
-        "animation",
-        "action",
         "scifi",
-        "fantasy",
-        "crime",
-        "music",
-        "drama",
-        "documentation",
-        "history",
-        "reality",
-        "war",
-        "romance",
-        "sport",
         "horror",
+        "fantasy",
+        "documentation",
+        "drama",
         "european",
-        "western",
+        "thriller",
+        "romance",
+        "action",
+        "animation",
+        "reality",
+        "family"
       ];
 
       // adding legend
-      let x = 400;
-      let x2 = 400;
+      let x = 300;
+      let x2 = 300;
       let count = 0;
       let y = 50;
 
       for (g of genres) {
         console.log(g);
-        if (count == 10) {
-          x = 400;
-          x2 = 400;
-          y = 100;
+        if (count == 7 ) {
+          x = 340;
+          x2 = 340;
+          y = 140;
         }
         legendSVG
           .append("rect")
           .attr("x", x)
           .attr("y", y)
-          .attr("width", 30)
-          .attr("height", 30)
+          .attr("width", 90)
+          .attr("height", 50)
           .attr("fill", color(g));
-        x += 80;
+        x += 140;
 
         legendSVG
           .append("text")
           .attr("x", x2)
-          .attr("y", y + 40)
-          .text(g)
-          .style("font-size", "11px");
-        x2 += 80;
+          .attr("y", y + 65)
+          .text(g.charAt(0).toUpperCase() + g.slice(1))
+          .style("font-size", "14px")
+          .style("font-style", "italics");
+        x2 += 140;
         count++;
       }
     </script>
