@@ -8,7 +8,7 @@
 
 <body>
   <h3>Matthew Mentis-Cort (mam692), Dani Ojeda (dr497), Jenny Jung (jj427)</h3>
-  <p id="Bar Chart">Visualization 1: Stacked Bar Chart</p>
+  <p id="Bar Chart">Visualization: Bar Charts</p>
   <p id="q2">How does Movie and TV episode Run Time Vary Over Time?</p>
   <svg id="legend-element" height="200" width="1450"></svg>
   <svg id="svg2" height="800" width="1450"></svg>
@@ -21,7 +21,7 @@
 
 function color(gen){
         if(gen=="comedy"){
-          return "#F2A900 ";
+          return "#FFC300 ";
         }
         if(gen=="family"){
           return "#6B5B93";
@@ -54,7 +54,8 @@ function color(gen){
           return "#69c4e9 ";
         }
         if(gen=="history"){
-          return "#F09CBA";
+          return "#c28107";
+
         }
         if(gen=="reality"){
           return "#61C0BF";
@@ -63,10 +64,10 @@ function color(gen){
           return "black";
         }
         if(gen=="romance"){
-          return "#EAB8D1";
+          return "#F09CBA";
         }
         if(gen=="sport"){
-          return "#FF9A00";
+          return "#f88c27 ";
         }
         if(gen=="horror"){
           return "#c20737 ";
@@ -151,11 +152,8 @@ function color(gen){
       const movieStats = {};
       let maximm = 0;
       let max_myear = 0;
-
-      
-      
-
-      data.forEach(d => {
+      // separating movie data by year, storiung total runtime, count, genres, and final color of bar
+     data.forEach(d => {
         if (d.type == 'MOVIE') {
           const d_genres = JSON.parse(d.genres.replace(/'/g, '"'));
           const year = (d.release_year);
@@ -165,19 +163,14 @@ function color(gen){
             movieStats[year].genres = movieStats[year].genres.concat(d_genres);
 
           }
-
           movieStats[year].totalLength += d.runtime;
           movieStats[year].count += 1;
         }
       });
-
       let tot_mg = [];
       for(year in movieStats){
         let g_counts = [];
-        // console.log(tvStats[year].genres);
-        // console.log(typeof(tvStats[year].genres));
         for(const g of movieStats[year].genres){
-          //console.log(g);
           if(!tot_mg.includes(g)){
             tot_mg.push(g);
           }
@@ -191,14 +184,14 @@ function color(gen){
         }
         let gmax;
         let gcmax = 0;
+        // getting most frequent genre for that year
         for(g in g_counts){
           if(g_counts[g]>gcmax){
             gcmax = g_counts[g];
             gmax = g;
           }
         }
-        // console.log(g_counts);
-        // console.log("most common movie genre: "+gmax);
+        //setting color of bar to color of most frequent genre for that year
         movieStats[year].color = color(gmax);
 
         if (movieStats[year].totalLength / movieStats[year].count > maximm) {
@@ -207,22 +200,18 @@ function color(gen){
           }
       }
 
-      console.log("all movie genres");
-      console.log(tot_mg);
+      // separating show data by year, storiung total runtime, count, genres, and final color of bar
 
       const tvStats = {};
       let maximt = 0;
       let max_tyear = 0;
       let tv_min = 50000;
       let tv_max=0;
-
       let tv_genres = [];
-
       data.forEach(d => {
         if (d.type == 'SHOW') {
           const d_genres = JSON.parse(d.genres.replace(/'/g, '"'));
-          //console.log(d_genres);
-          
+ 
           const year = (d.release_year);
           if (!tvStats[year]) {
             tvStats[year] = { totalLength: 0, count: 0, genres: d_genres, color: "" };
@@ -247,16 +236,9 @@ function color(gen){
       
       const tv_years = []
       let tot_g = [];
-
-      
-      
-      
       for(year in tvStats){
         let g_counts = [];
-        // console.log(tvStats[year].genres);
-        // console.log(typeof(tvStats[year].genres));
         for(const g of tvStats[year].genres){
-          //console.log(g);
           if(!tot_g.includes(g)){
             tot_g.push(g);
           }
@@ -270,14 +252,14 @@ function color(gen){
         }
         let gmax;
         let gcmax = 0;
+        // getting most frequent genre
         for(g in g_counts){
           if(g_counts[g]>gcmax){
             gcmax = g_counts[g];
             gmax = g;
           }
         }
-        // console.log(g_counts);
-        // console.log("most common tv genre: "+gmax);
+        //setting color of bar to color of most frequent genre for that year
         tvStats[year].color = color(gmax);
         if (tvStats[year].totalLength / tvStats[year].count > maximt) {
             maximt = tvStats[year].totalLength / tvStats[year].count;
@@ -286,8 +268,8 @@ function color(gen){
             
           }
       }
-      console.log("all tv genres");
-      console.log(tot_g);
+
+      // making chart margins and scales for both movies and tv shows
       const margins = {top: 10, right: 20, bottom: 50, left: 70};
 
       let newArea = svg2.append("g").attr('transform', `translate(${margin.left}, ${margin.top})`);
@@ -295,10 +277,6 @@ function color(gen){
       const upper_movie_max = (movieStats[max_myear].totalLength / movieStats[max_myear].count)
       const upper_tv_max = (tvStats[max_tyear].totalLength / tvStats[max_tyear].count)
 
-      console.log("movie max avg "+upper_movie_max);
-      console.log("tv max avg "+upper_tv_max);
-
-      //    const durationExtent = d3.extent(movieStats, );
       const durationScale = d3.scaleLinear().domain([0, upper_movie_max+10]).range([svg2ChartHeight, 0]);
       const releaseYearExtent = d3.extent(data, d => d.release_year);
       const releaseYearScale = d3.scaleLinear().domain([releaseYearExtent[0]-2,releaseYearExtent[1]+5]).range([0, svg2ChartWidth]);
@@ -339,7 +317,6 @@ function color(gen){
         .attr("y2",svg2ChartHeight)
         .style("stroke", color ) 
         .style("stroke-width", 10);
-        console.log(year + " " + color);
 
 
           //console.log(`Year: ${year}, Total Length: ${totalLength} mins, Count: ${count}, Average Length: ${averageLength.toFixed(2)} mins`);
