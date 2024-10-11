@@ -21,7 +21,7 @@
       Matthew Mentis-Cort (mam692), Dani Ojeda (dr497), Jenny Jung (jj427)
     </h3>
     <p id="Bar Chart">Visualization: Bar Charts</p>
-    
+
     <svg id="svg2" height="800" width="1450"></svg>
     <svg id="svg1" height="800" width="1450"></svg>
     <svg id="legend-element" height="300" width="1450"></svg>
@@ -38,18 +38,16 @@
           return "#f0892a";
         }
         if (gen == "thriller") {
-          
           return "#af91f3";
         }
         if (gen == "animation") {
-          return "#1159d8";
-          
+          return "#1ba7df";
         }
         if (gen == "action") {
-          return "#69c4e9 ";
+          return "#9CD08F";
         }
         if (gen == "scifi") {
-          return "#9CD08F";
+          return "#0a7e19 ";
         }
         if (gen == "fantasy") {
           return "#6A0572";
@@ -62,18 +60,15 @@
         }
         if (gen == "drama") {
           return "#FF6F61";
-          
         }
         if (gen == "documentation") {
           return "#B9D6F2";
-          
-    
         }
         if (gen == "history") {
           return "#c28107";
         }
         if (gen == "reality") {
-          return "#f76abd";
+          return "#ee64a7";
         }
         if (gen == "war") {
           return "maroon";
@@ -89,7 +84,6 @@
         }
         if (gen == "european") {
           return "#8F5C38";
-          
         }
         if (gen == "western") {
           return "#955251";
@@ -298,21 +292,22 @@
 
         // making chart margins and scales for both movies and tv shows
         svg2
-        .append("text")
-        .attr("x", (svg2ChartWidth/2) +margin.left+margin.right)
-        .attr("y", margin.top+10)
-        .text("Average Movie Run Time By Year")
-        .attr("text-anchor", "middle")
-        .style("font-size", "19px").style("font-weight", "bold");
+          .append("text")
+          .attr("x", svg2ChartWidth / 2 + margin.left + margin.right)
+          .attr("y", margin.top + 10)
+          .text("Average Movie Run Time By Year")
+          .attr("text-anchor", "middle")
+          .style("font-size", "19px")
+          .style("font-weight", "bold");
         const margins = { top: 10, right: 20, bottom: 50, left: 70 };
         svg1
-        .append("text")
-        .attr("x", (newWidth/2) +margin.left+margin.right)
-        .attr("y", margin.top+10)
-        .text("Average Episode Run Time By Year")
-        .attr("text-anchor", "middle")
-        .style("font-size", "19px").style("font-weight", "bold");
-        
+          .append("text")
+          .attr("x", newWidth / 2 + margin.left + margin.right)
+          .attr("y", margin.top + 10)
+          .text("Average Episode Run Time By Year")
+          .attr("text-anchor", "middle")
+          .style("font-size", "19px")
+          .style("font-weight", "bold");
 
         let newArea = svg2
           .append("g")
@@ -529,7 +524,7 @@
 
       legendSVG
         .append("text")
-        .attr("x", (svg2ChartWidth/2) +margin.left+margin.right)
+        .attr("x", svg2ChartWidth / 2 + margin.left + margin.right)
         .attr("y", 15)
         .text("Most Common Genre in a Specific Year")
         .attr("text-anchor", "middle")
@@ -548,7 +543,7 @@
         "action",
         "animation",
         "reality",
-        "family"
+        "family",
       ];
 
       // adding legend
@@ -559,7 +554,7 @@
 
       for (g of genres) {
         console.log(g);
-        if (count == 7 ) {
+        if (count == 7) {
           x = 340;
           x2 = 340;
           y = 140;
