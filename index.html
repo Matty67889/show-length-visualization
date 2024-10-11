@@ -44,15 +44,15 @@
     const legendSVG = d3.select('svg#legend-element');
 
     /* Netflix dataset visualization */
-    d3.csv('data/hbo_titles.csv', d3.autoType).then((data) => {
+    d3.csv('data/netflix_titles_cleaned_with_office.csv', d3.autoType).then((data) => {
       console.log(data);
 
 
       let newArea = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 
-      const durationExtent = d3.extent(data, d => d.runtime);
-      const durationScale = d3.scaleLinear().domain([0, d3.max(data, d => d.runtime)]).range([newHeight1, 0]);
+      const durationExtent = d3.extent(data, d => d.duration);
+      const durationScale = d3.scaleLinear().domain([0, d3.max(data, d => d.duration)]).range([newHeight1, 0]);
 
 
       let leftAxis = d3.axisLeft(durationScale);
@@ -74,10 +74,10 @@
       data.forEach(d => {
         newArea.append("circle")
           .attr("cx", releaseYearScale(d.release_year))
-          .attr("cy", durationScale(d.runtime))
+          .attr("cy", durationScale(d.duration))
           .attr("r", 5)
           .attr('opacity', 0.4)
-          .attr("fill", d.type === 'MOVIE' ? '#e8502f' : '#0e98a6')
+          .attr("fill", d.type === 'Movie' ? '#e8502f' : '#0e98a6')
       });
     });
 
