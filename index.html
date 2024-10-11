@@ -8,20 +8,22 @@
 
 <body>
   <h3>Matthew Mentis-Cort (mam692), Dani Ojeda (dr497), Jenny Jung (jj427)</h3>
-  <p id="Stacked Bar Chart">Visualization 1: Stacked Bar Chart</p>
-  <p id="q2">Problem 2</p>
-  <svg id="svg1" height="700" width="700"></svg>
-  <svg id="svg2" height="500" width="500"></svg>
+  <p id="Bar Chart">Visualization 1: Stacked Bar Chart</p>
+  <p id="q2">How does Movie and TV episode Run Time Vary Over Time?</p>
+  <svg id="svg1" height="800" width="1450"></svg>
+  <svg id="svg2" height="800" width="1450"></svg>
   <svg id="legend-element" height="500" width="500"></svg>
+  <svg id="svg3" height="500" width="500"></svg>
+  
   <script>
     /* Constants */
     // all chart margins
-    const margin = { top: 10, right: 10, bottom: 40, left: 50 };
+    const margin = { top: 10, right: 10, bottom: 90, left: 70 };
 
-    // svg1 constants
-    const svg = d3.select("#svg1");
-    const width = svg.attr("width");
-    const height = svg.attr("height");
+   // svg1 constants
+    const svg1 = d3.select("#svg1");
+    const width = svg1.attr("width");
+    const height = svg1.attr("height");
     const newWidth = width - margin.left - margin.right;
     const newHeight = height - margin.top - margin.bottom;
 
@@ -31,6 +33,12 @@
     const svg2Height = svg2.attr("height");
     const svg2ChartWidth = svg2Width - margin.left - margin.right;
     const svg2ChartHeight = svg2Height - margin.top - margin.bottom;
+    // svg3 constants
+    const svg = d3.select("#svg3");
+    const width1 = svg.attr("width");
+    const height1 = svg.attr("height");
+    const newWidth1 = width1 - margin.left - margin.right;
+    const newHeight1 = height1 - margin.top - margin.bottom;
 
     // legend
     const legendSVG = d3.select('svg#legend-element');
@@ -39,17 +47,29 @@
     d3.csv('data/netflix_titles_cleaned_with_office.csv', d3.autoType).then((data) => {
       console.log(data);
 
+
       let newArea = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+
       const durationExtent = d3.extent(data, d => d.duration);
-      const durationScale = d3.scaleLinear().domain([0, d3.max(data, d => d.duration)]).range([newHeight, 0]);
-      const releaseYearExtent = d3.extent(data, d => d.release_year);
-      const releaseYearScale = d3.scaleLinear().domain(releaseYearExtent).range([0, newWidth]);
+      const durationScale = d3.scaleLinear().domain([0, d3.max(data, d => d.duration)]).range([newHeight1, 0]);
+
 
       let leftAxis = d3.axisLeft(durationScale);
-      newArea.append('g').attr('class', 'y axis').call(leftAxis);
-      let bottomAxis = d3.axisBottom(releaseYearScale).ticks(10);
-      newArea.append('g').attr('class', 'x axis').attr('transform', `translate(0, ${newHeight})`).call(bottomAxis);
+      let leftGridlines = d3.axisLeft(durationScale).tickSize(-newWidth1).tickFormat("");
+      newArea.append('g')
+        .attr('class', 'y axis')
+        .call(leftAxis);
+
+      newArea.append("g").attr("class", "y gridlines").call(leftGridlines);
+
+      const releaseYearExtent = d3.extent(data, d => d.release_year);
+      const releaseYearScale = d3.scaleLinear().domain(releaseYearExtent).range([0, newWidth1]);
+
+      let bottomAxis = d3.axisBottom(releaseYearScale);
+      let bottomGridlines = d3.axisBottom(releaseYearScale).tickSize(-newHeight1).tickFormat("");
+      newArea.append('g').attr('class', 'x axis').attr('transform', `translate(0, ${newHeight1})`).call(bottomAxis);
+      newArea.append("g").attr("class", "x gridlines").call(bottomGridlines);
 
       data.forEach(d => {
         newArea.append("circle")
@@ -57,16 +77,17 @@
           .attr("cy", durationScale(d.duration))
           .attr("r", 5)
           .attr('opacity', 0.7)
-          .attr("fill", d.type === 'Movie' ? '#e8502f' : '#0e98a6');
+          .attr("fill", d.type === 'Movie' ? '#e8502f' : '#0e98a6')
       });
     });
+
 
     /* HBO dataset visualization */
     // averaging for svg2 visualization
     d3.csv('data/hbo_titles.csv', d3.autoType).then((data) => {
       const movieStats = {};
-      let maxim = 0;
-      let max_year = 0;
+      let maximm = 0;
+      let max_myear = 0;
 
       data.forEach(d => {
         if (d.type == 'MOVIE') {
@@ -77,15 +98,14 @@
 
           movieStats[year].totalLength += d.runtime;
           movieStats[year].count += 1;
-
-          if (movieStats[year].totalLength / movieStats[year].count > maxim) {
-            maxim = movieStats[year].totalLength / movieStats[year].count;
-            max_year = d.release_year;
-          }
         }
       });
 
       const tvStats = {};
+      let maximt = 0;
+      let max_tyear = 0;
+      let tv_min = 50000;
+      let tv_max=0;
 
       data.forEach(d => {
         if (d.type == 'SHOW') {
@@ -93,63 +113,197 @@
           if (!tvStats[year]) {
             tvStats[year] = { totalLength: 0, count: 0 };
           }
+          if(year<tv_min){
+              tv_min = year;
+            }
+            if(year>tv_max){
+              tv_max = year;
+            }
+          //console.log(year);
 
           tvStats[year].totalLength += d.runtime;
           tvStats[year].count += 1;
-
-          if (tvStats[year].totalLength / tvStats[year].count > maxim) {
-            maxim = tvStats[year].totalLength / tvStats[year].count;
-            max_year = d.release_year;
-          }
         }
 
       });
-      console.log(maxim);
-      console.log(max_year);
 
-      let newArea = svg2.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+      for(year in movieStats){
+        if (movieStats[year].totalLength / movieStats[year].count > maximm) {
+            maximm = movieStats[year].totalLength / movieStats[year].count;
+            max_myear = year;
+          }
+      }
+      const tv_years = []
+      
+      
+      for(year in tvStats){
+        if (tvStats[year].totalLength / tvStats[year].count > maximt) {
+            maximt = tvStats[year].totalLength / tvStats[year].count;
+            max_tyear = year;
+            tv_years.push(year);
+            
+          }
+      }
+      console.log(maximm);
+      console.log(max_myear);
+      console.log(maximt);
+      console.log(max_tyear);
+      const margins = {top: 10, right: 20, bottom: 50, left: 70};
+
+      let newArea = svg2.append("g").attr('transform', `translate(${margin.left}, ${margin.top})`);
+
+      const upper_movie_max = (movieStats[max_myear].totalLength / movieStats[max_myear].count)
+      const upper_tv_max = (tvStats[max_tyear].totalLength / tvStats[max_tyear].count)
+
+      console.log("movie max avg "+upper_movie_max);
+      console.log("tv max avg "+upper_tv_max);
 
       //    const durationExtent = d3.extent(movieStats, );
-      const durationScale = d3.scaleLinear().domain([0, maxim]).range([svg2ChartHeight, 0]);
+      const durationScale = d3.scaleLinear().domain([0, upper_movie_max+10]).range([svg2ChartHeight, 0]);
       const releaseYearExtent = d3.extent(data, d => d.release_year);
-      const releaseYearScale = d3.scaleLinear().domain(releaseYearExtent).range([0, svg2ChartWidth]);
+      const releaseYearScale = d3.scaleLinear().domain([releaseYearExtent[0]-2,releaseYearExtent[1]+5]).range([0, svg2ChartWidth]);
+      
+      const tvdurationScale = d3.scaleLinear().domain([0, upper_tv_max+10]).range([svg2ChartHeight, 0]);
+      const tvreleaseYearExtent = [tv_min-2,tv_max];
+      console.log(tvreleaseYearExtent);
+      const tvreleaseYearScale = d3.scaleLinear().domain([tvreleaseYearExtent[0],tvreleaseYearExtent[1]+5]).range([0, svg2ChartWidth]);
+      
 
       let leftAxis = d3.axisLeft(durationScale).ticks(20);
-      newArea.append('g').attr('class', 'y axis').call(leftAxis);
-      let bottomAxis = d3.axisBottom(releaseYearScale).ticks(20);
-      newArea.append('g').attr('class', 'x axis').attr('transform', `translate(0, ${svg2ChartHeight})`).call(bottomAxis);
+      newArea.append('g').attr('class', 'y axis').attr('transform', `translate(${0}, ${margin.top})`).call(leftAxis);
+      let chartArea = newArea.append('g')
+                       .attr('transform',`translate(${0},${margin.top})`);
 
+
+      let tvnewArea = svg1.append("g").attr('transform', `translate(${margin.left}, ${margin.top})`);
+      let tvleftAxis = d3.axisLeft(tvdurationScale).ticks(20);
+      tvnewArea.append('g').attr('class', 'y axis').attr('transform', `translate(${0}, ${margin.top})`).call(tvleftAxis);
+      
+      let tvchartArea = tvnewArea.append('g')
+                       .attr('transform',`translate(${0},${margin.top})`);
       for (const year in movieStats) {
         const { totalLength, count } = movieStats[year];
         const averageLength = totalLength / count;
         if (!isNaN(totalLength)) {
           //
-          newArea.append("circle")
-            .attr("cx", releaseYearScale(year))
-            .attr("cy", durationScale(averageLength))
-            .attr("r", 5)
-            .attr('opacity', 0.7)
-            .attr("fill", '#e8502f');
+          // newArea.append("circle")
+          //   .attr("cx", releaseYearScale(year))
+          //   .attr("cy", durationScale(averageLength))
+          //   .attr("r", 5)
+          //   .attr('opacity', 0.7)
+          //   .attr("fill", '#e8502f');
+
+        chartArea.append("line")
+        .attr("x1",releaseYearScale(year))
+        .attr("x2",releaseYearScale(year))
+        .attr("y1",durationScale(averageLength) + 2)  
+        .attr("y2",durationScale(averageLength))
+        .style("stroke", '#ed4ea0' ) 
+        .style("stroke-width", 10);
+        chartArea.append("line")
+        .attr("x1",releaseYearScale(year))
+        .attr("x2",releaseYearScale(year))
+        .attr("y1",durationScale(averageLength))  
+        .attr("y2",svg2ChartHeight)
+        .style("stroke", '#ed4ea0' ) 
+        .style("stroke-width", 10);
+
 
           console.log(`Year: ${year}, Total Length: ${totalLength} mins, Count: ${count}, Average Length: ${averageLength.toFixed(2)} mins`);
         }
       }
+
+      for (const year in movieStats) {
+        const { totalLength, count } = movieStats[year];
+        const averageLength = totalLength / count;
+        if (!isNaN(totalLength)) {
+        chartArea.append("text")
+        .attr("text-anchor","middle")
+        .attr("font-size","10px")
+        .attr("x",releaseYearScale(year))
+        .attr('y',durationScale(averageLength) - 5).text(averageLength.toFixed(0)).style("font-size", "8px");
+        // console.log(`Year: ${year}, Total Length: ${totalLength} mins, Count: ${count}, Average Length: ${averageLength.toFixed(2)} mins`);
+        }
+      }
+
+      
 
       for (const year in tvStats) {
         const { totalLength, count } = tvStats[year];
         const averageLength = totalLength / count;
         if (!isNaN(totalLength)) {
           //
-          newArea.append("circle")
-            .attr("cx", releaseYearScale(year))
-            .attr("cy", durationScale(averageLength))
-            .attr("r", 5)
-            .attr('opacity', 0.7)
-            .attr("fill", '#0e98a6');
+          // chartArea.append("circle")
+          //   .attr("cx", releaseYearScale(year))
+          //   .attr("cy", durationScale(averageLength))
+          //   .attr("r", 5)
+          //   .attr('opacity', 0.7)
+          //   .attr("fill", '#0e98a6');
+
+        tvchartArea.append("line")
+        .attr("x1",tvreleaseYearScale(year))
+        .attr("x2",tvreleaseYearScale(year))
+        .attr("y1",tvdurationScale(averageLength) + 2)  
+        .attr("y2",tvdurationScale(averageLength))
+        .style("stroke", '#f7cc57' ) 
+        .style("stroke-width", 10);
+        tvchartArea.append("line")
+        .attr("x1",tvreleaseYearScale(year))
+        .attr("x2",tvreleaseYearScale(year))
+        .attr("y1",tvdurationScale(averageLength))  
+        .attr("y2",newHeight)
+        .style("stroke", '#f7cc57' ) 
+        .style("stroke-width", 10);
 
           console.log(`Year: ${year}, Total Length: ${totalLength} mins, Count: ${count}, Average Length: ${averageLength.toFixed(2)} mins`);
         }
       }
+      for (const year in tvStats) {
+        const { totalLength, count } = tvStats[year];
+        const averageLength = totalLength / count;
+        if (!isNaN(totalLength)) {
+        tvchartArea.append("text")
+        .attr("text-anchor","middle")
+        .attr("font-size","10px")
+        .attr("x",tvreleaseYearScale(year))
+        .attr('y',tvdurationScale(averageLength) - 5).text(averageLength.toFixed(0)).style("font-size", "9px").style("fill", "black");
+        // console.log(`Year: ${year}, Total Length: ${totalLength} mins, Count: ${count}, Average Length: ${averageLength.toFixed(2)} mins`);
+        }
+      }
+      let tvbottomAxis = d3.axisBottom(tvreleaseYearScale).ticks(20).tickFormat(d => d.toString().replace(/,/g, ''));
+      tvnewArea.append('g').attr('class', 'x axis').attr('transform', `translate(${0}, ${newHeight+margin.top})`).call(tvbottomAxis);
+      let bottomAxis = d3.axisBottom(releaseYearScale).ticks(20).tickFormat(d => d.toString().replace(/,/g, ''));
+      newArea.append('g').attr('class', 'x axis').attr('transform', `translate(${0}, ${svg2ChartHeight+margin.top})`).call(bottomAxis);
+      
+      svg2.append("text")
+                    .attr("class", "axis-label")
+                    .attr("x",(svg2ChartWidth / 2) +margin.left)
+                    .attr("y", (svg2ChartHeight) +60)
+                    .attr("text-anchor", "middle")
+                    .text("Year");
+
+      svg2.append("text")
+                    .attr("class", "axis-label")
+                    .attr("transform", "rotate(-90)")
+                    .attr("x", -350)
+                    .attr("y", (svg2ChartHeight/2)-315)
+                    .attr("text-anchor", "middle")
+                    .text("Average Movie Runtime");
+
+     svg1.append("text")
+                    .attr("class", "axis-label")
+                    .attr("x",(svg2ChartWidth / 2) +margin.left)
+                    .attr("y", (newHeight) +60)
+                    .attr("text-anchor", "middle")
+                    .text("Year");
+
+      svg1.append("text")
+                    .attr("class", "axis-label")
+                    .attr("transform", "rotate(-90)")
+                    .attr("x", -350)
+                    .attr("y", (svg2ChartHeight/2)-315)
+                    .attr("text-anchor", "middle")
+                    .text("Average Episode Runtime")
     });
 
     // legend
@@ -158,7 +312,7 @@
       .attr("y", 50)
       .attr("width", 50)
       .attr("height", 50)
-      .attr("fill", "#e8502f");
+      .attr("fill", "#ed4ea0");
 
     legendSVG.append("text")
       .attr("x", 120)
@@ -170,7 +324,7 @@
       .attr("y", 150)
       .attr("width", 50)
       .attr("height", 50)
-      .attr("fill", "#0e98a6");
+      .attr("fill", "#f7cc57");
 
     legendSVG.append("text")
       .attr("x", 120)
