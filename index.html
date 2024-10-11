@@ -44,15 +44,15 @@
     const legendSVG = d3.select('svg#legend-element');
 
     /* Netflix dataset visualization */
-    d3.csv('data/netflix_titles_cleaned_with_office.csv', d3.autoType).then((data) => {
+    d3.csv('data/hbo_titles.csv', d3.autoType).then((data) => {
       console.log(data);
 
 
       let newArea = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 
-      const durationExtent = d3.extent(data, d => d.duration);
-      const durationScale = d3.scaleLinear().domain([0, d3.max(data, d => d.duration)]).range([newHeight1, 0]);
+      const durationExtent = d3.extent(data, d => d.runtime);
+      const durationScale = d3.scaleLinear().domain([0, d3.max(data, d => d.runtime)]).range([newHeight1, 0]);
 
 
       let leftAxis = d3.axisLeft(durationScale);
@@ -66,18 +66,18 @@
       const releaseYearExtent = d3.extent(data, d => d.release_year);
       const releaseYearScale = d3.scaleLinear().domain(releaseYearExtent).range([0, newWidth1]);
 
-      let bottomAxis = d3.axisBottom(releaseYearScale);
-      let bottomGridlines = d3.axisBottom(releaseYearScale).tickSize(-newHeight1).tickFormat("");
-      newArea.append('g').attr('class', 'x axis').attr('transform', `translate(0, ${newHeight1})`).call(bottomAxis);
-      newArea.append("g").attr("class", "x gridlines").call(bottomGridlines);
+      // let bottomAxis = d3.axisBottom(releaseYearScale);
+      // let bottomGridlines = d3.axisBottom(releaseYearScale).tickSize(-newHeight1).tickFormat("");
+      // newArea.append('g').attr('class', 'x axis').attr('transform', `translate(0, ${newHeight1})`).call(bottomAxis);
+      // newArea.append("g").attr("class", "x gridlines").call(bottomGridlines);
 
       data.forEach(d => {
         newArea.append("circle")
           .attr("cx", releaseYearScale(d.release_year))
-          .attr("cy", durationScale(d.duration))
+          .attr("cy", durationScale(d.runtime))
           .attr("r", 5)
-          .attr('opacity', 0.7)
-          .attr("fill", d.type === 'Movie' ? '#e8502f' : '#0e98a6')
+          .attr('opacity', 0.4)
+          .attr("fill", d.type === 'MOVIE' ? '#e8502f' : '#0e98a6')
       });
     });
 
@@ -288,7 +288,7 @@
                     .attr("x", -350)
                     .attr("y", (svg2ChartHeight/2)-315)
                     .attr("text-anchor", "middle")
-                    .text("Average Movie Runtime");
+                    .text("Average Movie Runtime (minutes)");
 
      svg1.append("text")
                     .attr("class", "axis-label")
@@ -303,7 +303,7 @@
                     .attr("x", -350)
                     .attr("y", (svg2ChartHeight/2)-315)
                     .attr("text-anchor", "middle")
-                    .text("Average Episode Runtime")
+                    .text("Average Episode Runtime (minutes)")
     });
 
     // legend
