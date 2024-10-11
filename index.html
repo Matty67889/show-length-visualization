@@ -3,6 +3,15 @@
     <meta charset="UTF-8" />
     <title>INFO 3300: Project 1 Milestone 2</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+      .gridlines line {
+        stroke: #bbb;
+      }
+
+      .gridlines .domain {
+        stroke: none;
+      }
+    </style>
   </head>
 
   <body>
@@ -142,7 +151,7 @@
       // });
 
       /* HBO dataset visualization */
-      // averaging for svg2 visualization
+      // averaging for svg1 and svg2 visualization
       d3.csv("data/hbo_titles.csv", d3.autoType).then((data) => {
         const movieStats = {};
         let maximm = 0;
@@ -299,12 +308,23 @@
           .domain([tvreleaseYearExtent[0], tvreleaseYearExtent[1] + 5])
           .range([0, svg2ChartWidth]);
         // adding left axis to both charts
+        let leftGridlines = d3
+          .axisLeft(durationScale)
+          .ticks(16)
+          .tickSize(-svg2ChartWidth - 10)
+          .tickFormat("");
+        newArea
+          .append("g")
+          .attr("class", "gridlines")
+          .attr("transform", `translate(${0},${margin.top})`)
+          .call(leftGridlines);
         let leftAxis = d3.axisLeft(durationScale).ticks(20);
         newArea
           .append("g")
           .attr("class", "y axis")
           .attr("transform", `translate(${0}, ${margin.top})`)
           .call(leftAxis);
+
         let chartArea = newArea
           .append("g")
           .attr("transform", `translate(${0},${margin.top})`);
@@ -318,6 +338,16 @@
           .attr("class", "y axis")
           .attr("transform", `translate(${0}, ${margin.top})`)
           .call(tvleftAxis);
+        let tvleftGridlines = d3
+          .axisLeft(tvdurationScale)
+          .ticks(30)
+          .tickSize(-newWidth - 10)
+          .tickFormat("");
+        tvnewArea
+          .append("g")
+          .attr("class", "gridlines")
+          .attr("transform", `translate(${0},${margin.top})`)
+          .call(tvleftGridlines);
 
         let tvchartArea = tvnewArea
           .append("g")
