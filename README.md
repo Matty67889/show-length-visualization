@@ -1,4 +1,4 @@
-# show-length-visualization
+# Movie Length Visualization
 
 This repo is for creating a visualization modeling how
 the length of shows have changed over time. This
